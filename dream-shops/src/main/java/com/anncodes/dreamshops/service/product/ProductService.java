@@ -7,6 +7,7 @@ import com.anncodes.dreamshops.model.Category;
 import com.anncodes.dreamshops.model.Image;
 import com.anncodes.dreamshops.model.Product;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.anncodes.dreamshops.dto.ImageDto;
@@ -21,7 +22,7 @@ import com.anncodes.dreamshops.request.AddProductRequest;
 import com.anncodes.dreamshops.request.ProductUpdateRequest;
 
 import lombok.RequiredArgsConstructor;
-//import org.modelmapper.ModelMapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.Optional;
 public class ProductService implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-  //  private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
     private final ImageRepository imageRepository;
 
     @Override
@@ -139,18 +140,12 @@ public class ProductService implements IProductService {
 
     @Override
     public ProductDto convertToDto(Product product) {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'convertToDto'");
+        ProductDto productDto = modelMapper.map(product, ProductDto.class);
+        List<Image> images = imageRepository.findByProductId(product.getId());
+        List<ImageDto> imageDtos = images.stream()
+                .map(image -> modelMapper.map(image, ImageDto.class))
+                .toList();
+        productDto.setImages(imageDtos);
+        return productDto;
     }
-
-    // @Override
-    // public ProductDto convertToDto(Product product) {
-    //     ProductDto productDto = modelMapper.map(product, ProductDto.class);
-    //     List<Image> images = imageRepository.findByProductId(product.getId());
-    //     List<ImageDto> imageDtos = images.stream()
-    //             .map(image -> modelMapper.map(image, ImageDto.class))
-    //             .toList();
-    //     productDto.setImages(imageDtos);
-    //     return productDto;
-    // }
 }
